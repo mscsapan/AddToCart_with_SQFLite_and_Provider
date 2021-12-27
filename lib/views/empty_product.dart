@@ -5,8 +5,21 @@ class EmptyProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Empty'),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset('assets/product/empty_cart.png'),
+          const Text(
+            'No Product Available 😔',
+            style: TextStyle(
+              fontSize: 25.0,
+              fontWeight: FontWeight.w400,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:addtocart_sqflite_and_provider/database/database_helper.dart';
+import '../database/database_helper.dart';
 
 import '../controller/state_controller.dart';
 import '../screen/cart_screen.dart';
@@ -16,16 +16,37 @@ PreferredSizeWidget appBar(BuildContext context) {
     ),
     elevation: 0.0,
     actions: [
-      ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          primary: Colors.transparent,
-          elevation: 0.0,
-        ),
+      IconButton(
         onPressed: () async {
-          await DatabaseHelper.databaseHelper.deleteDatabase();
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Delete Database?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                    onPressed: () async {
+                      //await DatabaseHelper.databaseHelper.deleteDatabase();
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Database Delete Successfully'),
+                        ),
+                      );
+                    },
+                    child: const Text('Delete')),
+              ],
+              content:
+                  const Text('If Press Delete, Whole Database\'ll be Delete'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.0)),
+            ),
+          );
         },
-        icon: const Icon(Icons.filter_list_outlined),
-        label: const Text('Filter'),
+        icon: const Icon(Icons.delete),
       ),
       InkWell(
         onTap: () => Navigator.push(
@@ -43,26 +64,28 @@ PreferredSizeWidget appBar(BuildContext context) {
             clipBehavior: Clip.none,
             children: [
               const Icon(Icons.add_shopping_cart_outlined, size: 30.0),
-              Positioned(
-                top: -6.0,
-                right: 2.0,
-                child: Container(
-                  height: 18.0,
-                  width: 18.0,
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                      color: Colors.red, shape: BoxShape.circle),
-                  child: Consumer<CartController>(
-                    builder: (context, count, child) => Text(
-                      count.getCounter().toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              )
+              Consumer<CartController>(
+                  builder: (context, count, _) => Visibility(
+                        visible: count.counter == 0 ? false : true,
+                        child: Positioned(
+                          top: -6.0,
+                          right: 2.0,
+                          child: Container(
+                            height: 18.0,
+                            width: 18.0,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                                color: Colors.red, shape: BoxShape.circle),
+                            child: Text(
+                              count.getCounter().toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )),
             ],
           ),
         ),

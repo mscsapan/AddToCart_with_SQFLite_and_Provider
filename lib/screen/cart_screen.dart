@@ -1,14 +1,16 @@
+import '../views/add_function_button.dart';
+import '../views/remove_function_button.dart';
+
 import '../views/delete_button.dart';
 
 import '../views/total_price.dart';
+import '../views/cart_app_bar.dart';
 
 import '../views/empty_product.dart';
 
 import '../views/cart_images.dart';
 import '../views/title_and_price.dart';
 import '../views/count_button.dart';
-
-import '../database/database_helper.dart';
 
 import '../model/model.dart';
 
@@ -30,49 +32,14 @@ class _CartScreenState extends State<CartScreen> {
     double width = MediaQuery.of(context).size.width;
     final cartController = Provider.of<CartController>(context, listen: true);
     return Scaffold(
-        appBar: AppBar(
-            elevation: 0.0,
-            backgroundColor: const Color(0xFF2ECC71),
-            title: const Text('My Cart'),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(top: 12.0, right: 10.0),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    const Icon(Icons.add_shopping_cart_outlined, size: 30.0),
-                    Positioned(
-                      top: -6.0,
-                      right: 2.0,
-                      child: Container(
-                        height: 18.0,
-                        width: 18.0,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                            color: Colors.red, shape: BoxShape.circle),
-                        child: Consumer<CartController>(
-                          builder: (context, count, child) => Text(
-                            count.getCounter().toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-            centerTitle: true),
+        appBar: cartAppBar(context),
         body: SizedBox(
           height: height,
           width: width,
           child: FutureBuilder<List<Product>>(
             future: cartController.getAllQueryProduct(),
             builder: (context, AsyncSnapshot<List<Product>> queryProduct) {
-              if (queryProduct.data == null) {
+              if (queryProduct.data == null || queryProduct.data!.isEmpty) {
                 return const EmptyProduct();
               } else {
                 return queryProduct.hasData
@@ -110,81 +77,21 @@ class _CartScreenState extends State<CartScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             TitleAndPrice(
-                                              title: product.name,
-                                              price:
-                                                  '${product.initialPrice.toDouble()}',
-                                              unit: product.unit,
-                                            ),
+                                                title: product.name,
+                                                price:
+                                                    '${product.price.toDouble()}',
+                                                unit: product.unit),
                                             DeleteButton(product: product),
                                           ],
                                         ),
                                         CountButton(
                                           width: width,
                                           quantity: product.quantity.toString(),
-                                          addTap: () async {
-                                            int itemQuantity = product.quantity;
-                                            int oldPrice = product.price;
-                                            itemQuantity++;
-                                            int newPrice =
-                                                itemQuantity * oldPrice;
-                                            await DatabaseHelper.databaseHelper
-                                                .updateQuantity(Product(
-                                              id: product.id,
-                                              name: product.name,
-                                              image: product.image,
-                                              initialPrice:
-                                                  product.initialPrice,
-                                              price: newPrice,
-                                              unit: product.unit,
-                                              quantity: itemQuantity,
-                                            ))
-                                                .then(
-                                              (value) {
-                                                itemQuantity = 0;
-                                                newPrice = 0;
-                                                cartController
-                                                    .increaseTotalPrice(
-                                                  product.initialPrice
-                                                      .toDouble(),
-                                                );
-                                              },
-                                            );
-                                          },
-                                          removeTap: () async {
-                                            int itemQuantity = product.quantity;
-                                            int oldPrice = product.price;
-                                            itemQuantity--;
-                                            if (itemQuantity > 0) {
-                                              int newPrice =
-                                                  itemQuantity * oldPrice;
-                                              await DatabaseHelper
-                                                  .databaseHelper
-                                                  .updateQuantity(
-                                                Product(
-                                                  id: product.id,
-                                                  name: product.name,
-                                                  image: product.image,
-                                                  initialPrice:
-                                                      product.initialPrice,
-                                                  price: newPrice,
-                                                  unit: product.unit,
-                                                  quantity: itemQuantity,
-                                                ),
-                                              )
-                                                  .then(
-                                                (value) {
-                                                  itemQuantity = 0;
-                                                  newPrice = 0;
-                                                  cartController
-                                                      .decreaseTotalPrice(
-                                                    product.initialPrice
-                                                        .toDouble(),
-                                                  );
-                                                },
-                                              );
-                                            }
-                                          },
-                                        )
+                                          addTap: () => addFunctionButton(
+                                              product, cartController),
+                                          removeTap: () => removeFunctionButton(
+                                              product, cartController),
+                                        ),
                                       ],
                                     ),
                                   )

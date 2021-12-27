@@ -5,10 +5,6 @@ import '../model/model.dart';
 import 'package:flutter/material.dart';
 
 class CartController with ChangeNotifier {
-  int _count = 1;
-
-  int get count => _count;
-
   Future<List<Product>>? _getProduct;
 
   Future<List<Product>> get getProduct => _getProduct!;
@@ -17,20 +13,6 @@ class CartController with ChangeNotifier {
 
   Future<List<Product>> getAllQueryProduct() async {
     return _getProduct = _databaseHelper!.getDatabaseProduct();
-  }
-
-  void incrementProductItem() {
-    _count++;
-    notifyListeners();
-  }
-
-  void decrementProductItem() {
-    if (_count > 1) {
-      _count--;
-    } else {
-      _count;
-    }
-    notifyListeners();
   }
 
   int _counter = 0;
@@ -50,7 +32,6 @@ class CartController with ChangeNotifier {
   void _getProductItem() async {
     SharedPreferences item = await SharedPreferences.getInstance();
     _counter = item.getInt('counter') ?? 0;
-
     _totalPrice = item.getDouble('total_price') ?? 0.0;
     notifyListeners();
   }
@@ -62,10 +43,8 @@ class CartController with ChangeNotifier {
   }
 
   decreaseCounter() {
-    if (_counter > 1) {
-      _counter--;
-      _setProductItem();
-    }
+    _counter--;
+    _setProductItem();
     notifyListeners();
   }
 

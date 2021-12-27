@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import '../database/database_helper.dart';
 import '../model/model.dart';
 
@@ -28,7 +30,7 @@ class InfoView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${product.name}',
+                      product.name,
                       style: const TextStyle(
                           fontSize: 18.0, fontWeight: FontWeight.w400),
                     ),
@@ -52,24 +54,41 @@ class InfoView extends StatelessWidget {
                 child: Consumer<CartController>(
                   builder: (context, countController, child) => ElevatedButton(
                     onPressed: () async {
-                      db!
-                          .insertProduct(Product(
-                              id: position + 1,
-                              name: product.name,
-                              image: product.image,
-                              initialPrice: product.initialPrice,
-                              price: product.price,
-                              quantity: product.quantity,
-                              unit: product.unit))
-                          .then((value) {
+                      await db!
+                          .insertProduct(
+                        Product(
+                          id: position + 1,
+                          name: product.name,
+                          image: product.image,
+                          initialPrice: product.initialPrice,
+                          price: product.price,
+                          quantity: product.quantity,
+                          unit: product.unit,
+                        ),
+                      )
+                          .then((v) {
                         countController.increaseTotalPrice(
                             double.parse('${product.price}'));
                         countController.increaseCounter();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            duration: const Duration(milliseconds: 800),
+                            backgroundColor: Colors.green[900],
+                            content: Text(
+                              '${product.name} is Added Successfully',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16.0,
+                                  letterSpacing: 1.2),
+                            ),
+                          ),
+                        );
                       });
-                      countController.incrementProductItem();
                     },
                     style: ElevatedButton.styleFrom(
-                        primary: Colors.transparent, elevation: 0.0),
+                        primary: Colors.transparent,
+                        elevation: 0.0,
+                        onPrimary: Colors.transparent),
                     child: const Text(
                       'Add',
                       style: TextStyle(

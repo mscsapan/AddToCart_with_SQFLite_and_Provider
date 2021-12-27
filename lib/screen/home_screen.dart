@@ -20,6 +20,7 @@ class HomeScreen extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
         child: ListView.builder(
           itemCount: productList.length,
+          physics: const BouncingScrollPhysics(),
           itemBuilder: (context, position) => Container(
             height: height * 0.16,
             width: width,
